@@ -22,52 +22,48 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-public class test1 {
-	
-    public static void main(String[] args) throws IOException {
-    	
-    	/*
-    	 초단기 실황 -> 현 시간대의 정보
-    	 초단기 예보 -> 6시간 이후 까지의 정보
-    	 동네예보 -> 3시간격으로 3일까지의 정보
-    	 */
 
-    	int inputdatenum = 0;
-    	int inputdaynum = 0;
-    	String data = null;
-    	Scanner menu = new Scanner(System.in);
-    	Scanner datenum = new Scanner(System.in);
-    	Scanner daynum = new Scanner(System.in);
-    	
-    	
-    	System.out.println("1.초단기실황, 2.초단기예보, 3.동네예보, 4.예보버전");
-    	String input = menu.next();
-    	System.out.println("날짜를 입력해 주세요 ex)20201129");
-    	inputdatenum = datenum.nextInt();
-    	System.out.println("시간을 입력해주세요 ex)0600");
-    	inputdaynum = daynum.nextInt();
-    	
-		switch(input)
-    	{
-    	case "1":
-    		srtncst(inputdatenum,inputdaynum);
-    		break;
-    	case "2":
-    		srtfcst(inputdatenum,inputdaynum);
-    		break;
-    	case "3":
-    		village(inputdatenum,inputdaynum);
-    		break;
-    	case "4":
-    		villagever(inputdatenum,inputdaynum);
-    		break;
-    	}
-    	
+class SrtNcstClass
+{
+	class Jsonarray{
+    	Response response;	
     }
     
-    static public void srtncst(int inputdatenum, int inputdaynum) throws IOException
+    class Response{
+    	Header header;
+    	Body body;
+    }
+    
+    class Header{
+    	int resultCode;
+    	String resultMsg;
+    }
+    
+    class Body{
+    	String dataType;
+    	Items items;
+    	int pageNo;
+    	int numOfRows;
+    	int totalCount;
+    }
+    
+    class Items{
+    	ArrayList<Item> item;
+    }
+    
+    class Item{
+    	int baseDate;
+    	int baseTime;
+		String category;
+		double obsrValue;
+		int nx;
+		int ny;
+    }
+    
+	void srtNcst(int inputdatenum, int inputdaynum) throws IOException
     {
 
+    	String column = null;
     	StringBuilder urlBuilder = null;
     	urlBuilder = new StringBuilder("http://apis.data.go.kr/1360000/VilageFcstInfoService/getUltraSrtNcst"); /*URL*/
 		urlBuilder.append("?" + URLEncoder.encode("ServiceKey","UTF-8") + "=H1%2BKVL4VVRqLerRMBwOFwiFjimeJLM%2BoeR8CXL4lKXN0Hq8%2Btr7j0crO25qe%2BMP%2BiTejjZsZkcovfc6bcmlePQ%3D%3D"); /*Service Key*/
@@ -101,13 +97,194 @@ public class test1 {
         }
         rd.close();
         conn.disconnect();
+        
         String data = sb.toString();
         
+        Gson gson = new Gson();
+        
+        Jsonarray jsonarray = gson.fromJson(data, Jsonarray.class);
+        
+        if(Integer.toString(jsonarray.response.header.resultCode).equals("0"))
+        {
+        	ArrayList<Item> items = jsonarray.response.body.items.item;
+            
+
+    		@SuppressWarnings("resource")
+        	XSSFWorkbook workbook = new XSSFWorkbook();
+        	XSSFSheet sheet = workbook.createSheet("bbc123");
+        	XSSFCell cell = null;
+        	XSSFRow row = null;
+        	Item item = null;
+        	int temp = 0;
+        	int j = 0;
+        	String pty = "없음";
+        	String sky = "없음";
+        	
+        	row = sheet.createRow(0);
+        	cell = row.createCell(0);
+        	cell.setCellValue("발표날짜");
+        	cell = row.createCell(1);
+        	cell.setCellValue("발표시간");
+        	cell = row.createCell(2);
+        	cell.setCellValue("기온");
+        	cell = row.createCell(3);
+        	cell.setCellValue("1시간 강수량");
+        	cell = row.createCell(4);
+        	cell.setCellValue("동서바람성분");
+        	cell = row.createCell(5);
+        	cell.setCellValue("남북바람성분");
+        	cell = row.createCell(6);
+        	cell.setCellValue("습도");
+        	cell = row.createCell(7);
+        	cell.setCellValue("강수형태");
+        	cell = row.createCell(8);
+        	cell.setCellValue("풍향");
+        	cell = row.createCell(9);
+        	cell.setCellValue("풍속");            	
+        	
+			for (int i = 0; i < items.size(); i++) {
+				item = items.get(i);
+
+				row = sheet.createRow(1+j);
+				j = j+1;
+				cell = row.createCell(0);
+				cell.setCellValue(item.baseDate);
+				cell = row.createCell(1);
+				cell.setCellValue(item.baseTime);
+				temp = item.baseTime;
+				
+				while (true) {
+					switch (item.category) {
+					case "T1H":
+						cell = row.createCell(2);
+						cell.setCellValue(item.obsrValue+"℃");
+						break;
+					case "PTY":
+						cell = row.createCell(7);
+						switch((int)item.obsrValue)
+						{
+						case 0:
+							pty = "없음";
+							break;
+						case 1:
+							pty = "비";
+							break;
+						case 2:
+							pty = "비/눈(진눈개비)";
+							break;
+						case 3:
+							pty = "눈";
+							break;
+						case 4:
+							pty = "소나기";
+							break;
+						case 5:
+							pty = "빗방울";
+							break;
+						case 6:
+							pty = "빗방울/눈날림";
+							break;
+						case 7:
+							pty = "눈날림";
+							break;
+						}
+						cell.setCellValue(pty);
+						break;
+					case "RN1":
+						cell = row.createCell(3);
+						cell.setCellValue(item.obsrValue+"mm");
+						break;
+					case "REH":
+						cell = row.createCell(6);
+						cell.setCellValue(item.obsrValue+"%");
+						break;
+					case "UUU":
+						cell = row.createCell(4);
+						cell.setCellValue(item.obsrValue+"m/s");
+						break;
+					case "VVV":
+						cell = row.createCell(5);
+						cell.setCellValue(item.obsrValue+"m/s");
+						break;
+					case "VEC":
+						cell = row.createCell(8);
+						cell.setCellValue(item.obsrValue+"m/s");
+						break;
+					case "WSD":
+						cell = row.createCell(9);
+						cell.setCellValue(item.obsrValue+"m/s");
+						break;
+					}
+					i =  i+1;
+					if(i >= items.size()) {break;}
+					item = items.get(i);
+					if(item.baseTime != temp)
+					{
+						i = i-1;
+						item = items.get(i);
+						break;
+					}
+				}
+			}
+    		
+        	try { 
+        		FileOutputStream fos = new FileOutputStream("초단기실황"+inputdatenum+"_"+inputdaynum+".xlsx");
+        		workbook.write(fos); fos.close(); System.out.println("성공");
+        	}
+        	catch(Exception e) { 
+        		e.printStackTrace(); 
+        		}
+        }
+        else
+        {
+        	System.out.println("resultCode : " + jsonarray.response.header.resultCode + " resultMsg : "+jsonarray.response.header.resultMsg);
+        }
+    }
+}
+
+class SrtFcstClass
+{
+	class Jsonarray{
+    	Response response;	
     }
     
-    public static void srtfcst(int inputdatenum, int inputdaynum) throws IOException
+    class Response{
+    	Header header;
+    	Body body;
+    }
+    
+    class Header{
+    	int resultCode;
+    	String resultMsg;
+    }
+    
+    class Body{
+    	String dataType;
+    	Items items;
+    	int pageNo;
+    	int numOfRows;
+    	int totalCount;
+    }
+    
+    class Items{
+    	ArrayList<Item> item;
+    }
+    
+    class Item{
+    	int baseDate;
+    	int baseTime;
+		String category;
+		int fcstDate;
+		int fcstTime;
+		double fcstValue;
+		int nx;
+		int ny;
+    }
+    
+	void srtFcst(int inputdatenum, int inputdaynum) throws IOException
     {
 
+    	String column = null;
     	StringBuilder urlBuilder = null;
     	urlBuilder = new StringBuilder("http://apis.data.go.kr/1360000/VilageFcstInfoService/getUltraSrtFcst"); /*URL*/
         urlBuilder.append("?" + URLEncoder.encode("ServiceKey","UTF-8") + "=H1%2BKVL4VVRqLerRMBwOFwiFjimeJLM%2BoeR8CXL4lKXN0Hq8%2Btr7j0crO25qe%2BMP%2BiTejjZsZkcovfc6bcmlePQ%3D%3D"); /*Service Key*/
@@ -141,11 +318,227 @@ public class test1 {
         }
         rd.close();
         conn.disconnect();
+        
         String data = sb.toString();
         
+        Gson gson = new Gson();
+        
+        Jsonarray jsonarray = gson.fromJson(data, Jsonarray.class);
+        
+        if(Integer.toString(jsonarray.response.header.resultCode).equals("0"))
+        {
+        	ArrayList<Item> items = jsonarray.response.body.items.item;
+            
+
+    		@SuppressWarnings("resource")
+        	XSSFWorkbook workbook = new XSSFWorkbook();
+        	XSSFSheet sheet = workbook.createSheet("bbc123");
+        	XSSFCell cell = null;
+        	XSSFRow row = null;
+        	Item item = null;
+        	String temp = null;
+        	int j = 0;
+        	int size = 1;
+        	String pty = "없음";
+        	String sky = "없음";
+        	String lgt = "없음";
+        	
+        	XSSFRow[] rowarr;
+        	
+        	row = sheet.createRow(0);
+        	cell = row.createCell(0);
+        	cell.setCellValue("예보날짜");
+        	cell = row.createCell(1);
+        	cell.setCellValue("예보시간");
+        	cell = row.createCell(2);
+        	cell.setCellValue("기온");
+        	cell = row.createCell(3);
+        	cell.setCellValue("1시간 강수량");
+        	cell = row.createCell(4);
+        	cell.setCellValue("하늘상태");
+        	cell = row.createCell(5);
+        	cell.setCellValue("동서바람성분");
+        	cell = row.createCell(6);
+        	cell.setCellValue("남북바람성분");
+        	cell = row.createCell(7);
+        	cell.setCellValue("습도");
+        	cell = row.createCell(8);
+        	cell.setCellValue("강수형태");
+        	cell = row.createCell(9);
+        	cell.setCellValue("낙뢰");   
+        	cell = row.createCell(10);
+        	cell.setCellValue("풍향");
+        	cell = row.createCell(11);
+        	cell.setCellValue("풍속");         	
+        	
+        	while(true)
+        	{
+        		item = items.get(size);
+        		if(items.get(0).fcstTime == item.fcstTime)break;
+        		
+        		size++;
+        	}
+        	
+        	rowarr = new XSSFRow[size];
+        	
+        	for(int i = 0; i< size; i++)
+        	{
+        		item = items.get(i);
+        		rowarr[i] = sheet.createRow(i+1);
+        		cell = rowarr[i].createCell(0);
+				cell.setCellValue(item.fcstDate);
+				cell = rowarr[i].createCell(1);
+				cell.setCellValue(item.fcstTime);
+        	}
+        	
+			for (int i = 0; i < items.size(); i++) {
+				
+				item = items.get(i);
+
+				if (j == size) j = 0;
+
+				switch (item.category) {
+				case "T1H":
+					cell = rowarr[j].createCell(2);
+					cell.setCellValue(item.fcstValue + "℃");
+					break;
+				case "PTY":
+					cell = rowarr[j].createCell(8);
+					switch ((int) item.fcstValue) {
+					case 0:
+						pty = "없음";
+						break;
+					case 1:
+						pty = "비";
+						break;
+					case 2:
+						pty = "비/눈(진눈개비)";
+						break;
+					case 3:
+						pty = "눈";
+						break;
+					case 4:
+						pty = "소나기";
+						break;
+					case 5:
+						pty = "빗방울";
+						break;
+					case 6:
+						pty = "빗방울/눈날림";
+						break;
+					case 7:
+						pty = "눈날림";
+						break;
+					}
+					cell.setCellValue(pty);
+					break;
+				case "SKY":
+					cell = rowarr[j].createCell(4);
+					switch ((int) item.fcstValue) {
+					case 1:
+						sky = "맑음";
+						break;
+					case 3:
+						sky = "구름많음";
+						break;
+					case 4:
+						sky = "흐림";
+						break;
+					}
+					cell.setCellValue(sky);
+					break;
+				case "RN1":
+					cell = rowarr[j].createCell(3);
+					cell.setCellValue(item.fcstValue + "mm");
+					break;
+				case "REH":
+					cell = rowarr[j].createCell(7);
+					cell.setCellValue(item.fcstValue + "%");
+					break;
+				case "UUU":
+					cell = rowarr[j].createCell(5);
+					cell.setCellValue(item.fcstValue + "m/s");
+					break;
+				case "VVV":
+					cell = rowarr[j].createCell(6);
+					cell.setCellValue(item.fcstValue + "m/s");
+					break;
+				case "LGT":
+					cell = rowarr[j].createCell(9);
+					if (item.fcstValue == 0)
+						lgt = "없음";
+					else
+						lgt = "있음";
+					cell.setCellValue(lgt);
+					break;
+				case "VEC":
+					cell = rowarr[j].createCell(10);
+					cell.setCellValue(item.fcstValue + "m/s");
+					break;
+				case "WSD":
+					cell = rowarr[j].createCell(11);
+					cell.setCellValue(item.fcstValue + "m/s");
+					break;
+				}
+				j++;
+
+			}
+    		
+        	try { 
+        		FileOutputStream fos = new FileOutputStream("초단기예보"+inputdatenum+"_"+inputdaynum+".xlsx");
+        		workbook.write(fos); fos.close(); System.out.println("성공");
+        	}
+        	catch(Exception e) { 
+        		e.printStackTrace(); 
+        		}
+        }
+        else
+        {
+        	System.out.println("resultCode : " + jsonarray.response.header.resultCode + " resultMsg : "+jsonarray.response.header.resultMsg);
+        }
+    }
+}
+
+class VilageClass
+{
+	class Jsonarray{
+    	Response response;	
     }
     
-    public static void village(int inputdatenum, int inputdaynum) throws IOException
+    class Response{
+    	Header header;
+    	Body body;
+    }
+    
+    class Header{
+    	int resultCode;
+    	String resultMsg;
+    }
+    
+    class Body{
+    	String dataType;
+    	Items items;
+    	int pageNo;
+    	int numOfRows;
+    	int totalCount;
+    }
+    
+    class Items{
+    	ArrayList<Item> item;
+    }
+    
+    class Item{
+    	int baseDate;
+    	int baseTime;
+		String category;
+		int fcstDate;
+		int fcstTime;
+		double fcstValue;
+		int nx;
+		int ny;
+    }
+    
+	void vilage(int inputdatenum, int inputdaynum) throws IOException
     {
 
     	String column = null;
@@ -202,6 +595,8 @@ public class test1 {
         	Item item = null;
         	int temp = 0;
         	int j = 0;
+        	String pty = "없음";
+        	String sky = "없음";
         	
         	row = sheet.createRow(0);
         	cell = row.createCell(0);
@@ -253,59 +648,98 @@ public class test1 {
 					switch (item.category) {
 					case "POP":
 						cell = row.createCell(2);
-						cell.setCellValue(item.fcstValue);
+						cell.setCellValue(item.fcstValue+"%");
 						break;
 					case "PTY":
 						cell = row.createCell(3);
-						cell.setCellValue(item.fcstValue);
+						switch((int)item.fcstValue)
+						{
+						case 0:
+							pty = "없음";
+							break;
+						case 1:
+							pty = "비";
+							break;
+						case 2:
+							pty = "비/눈(진눈개비)";
+							break;
+						case 3:
+							pty = "눈";
+							break;
+						case 4:
+							pty = "소나기";
+							break;
+						case 5:
+							pty = "빗방울";
+							break;
+						case 6:
+							pty = "빗방울/눈날림";
+							break;
+						case 7:
+							pty = "눈날림";
+							break;
+						}
+						cell.setCellValue(pty);
 						break;
 					case "R06":
 						cell = row.createCell(4);
-						cell.setCellValue(item.fcstValue);
+						cell.setCellValue(item.fcstValue+"mm");
 						break;
 					case "REH":
 						cell = row.createCell(5);
-						cell.setCellValue(item.fcstValue);
+						cell.setCellValue(item.fcstValue+"%");
 						break;
 					case "S06":
 						cell = row.createCell(6);
-						cell.setCellValue(item.fcstValue);
+						cell.setCellValue(item.fcstValue+"cm");
 						break;
 					case "SKY":
 						cell = row.createCell(7);
-						cell.setCellValue(item.fcstValue);
+						switch((int)item.fcstValue)
+						{
+						case 1:
+							sky = "맑음";
+							break;
+						case 3:
+							sky = "구름많음";
+							break;
+						case 4:
+							sky = "흐림";
+							break;
+						}
+						cell.setCellValue(sky);
 						break;
 					case "T3H":
 						cell = row.createCell(8);
-						cell.setCellValue(item.fcstValue);
+						cell.setCellValue(item.fcstValue+"℃");
 						break;
 					case "TMN":
 						cell = row.createCell(9);
-						cell.setCellValue(item.fcstValue);
+						cell.setCellValue(item.fcstValue+"℃");
 						break;
 					case "TMX":
 						cell = row.createCell(10);
-						cell.setCellValue(item.fcstValue);
+						cell.setCellValue(item.fcstValue+"℃");
 						break;
 					case "UUU":
 						cell = row.createCell(11);
-						cell.setCellValue(item.fcstValue);
+						cell.setCellValue(item.fcstValue+"m/s");
 						break;
 					case "VVV":
 						cell = row.createCell(12);
-						cell.setCellValue(item.fcstValue);
+						cell.setCellValue(item.fcstValue+"m/s");
 						break;
 					case "WAV":
 						cell = row.createCell(13);
-						cell.setCellValue(item.fcstValue);
+						cell.setCellValue(item.fcstValue+"M");
 						break;
 					case "VEC":
 						cell = row.createCell(14);
-						cell.setCellValue(item.fcstValue);
+						cell.setCellValue(item.fcstValue+"m/s");
 						break;
 					case "WSD":
 						cell = row.createCell(15);
-						cell.setCellValue(item.fcstValue);
+						cell.setCellValue(item.fcstValue+"m/s");
 						break;
 					}
 					i =  i+1;
@@ -333,8 +767,56 @@ public class test1 {
         	System.out.println("resultCode : " + jsonarray.response.header.resultCode + " resultMsg : "+jsonarray.response.header.resultMsg);
         }
     }
+}
+
+public class test1 {
+	
+    public static void main(String[] args) throws IOException {
+    	
+    	/*
+    	 초단기 실황 -> 현 시간대의 정보
+    	 초단기 예보 -> 6시간 이후 까지의 정보
+    	 동네예보 -> 3시간격으로 3일까지의 정보
+    	 */
+
+    	int inputdatenum = 0;
+    	int inputdaynum = 0;
+    	String data = null;
+    	Scanner menu = new Scanner(System.in);
+    	Scanner datenum = new Scanner(System.in);
+    	Scanner daynum = new Scanner(System.in);
+    	
+    	
+    	System.out.println("1.초단기실황, 2.초단기예보, 3.동네예보, 4.예보버전");
+    	String input = menu.next();
+    	System.out.println("날짜를 입력해 주세요 ex)20201129");
+    	inputdatenum = datenum.nextInt();
+    	System.out.println("시간을 입력해주세요 ex)0600");
+    	inputdaynum = daynum.nextInt();
+    	
+		switch(input)
+    	{
+    	case "1":
+    		SrtNcstClass sn = new SrtNcstClass();
+    		sn.srtNcst(inputdatenum,inputdaynum);
+    		break;
+    	case "2":
+    		SrtFcstClass sf = new SrtFcstClass();
+    		sf.srtFcst(inputdatenum, inputdaynum);
+    		break;
+    	case "3":
+    		VilageClass vc = new VilageClass();
+    		vc.vilage(inputdatenum,inputdaynum);
+    		break;
+    	case "4":
+    		vilagever(inputdatenum,inputdaynum);
+    		break;
+    	}
+    	
+    }
     
-    public static void villagever(int inputdatenum, int inputdaynum) throws IOException
+    
+    public static void vilagever(int inputdatenum, int inputdaynum) throws IOException
     {
 
     	StringBuilder urlBuilder = null;
@@ -371,40 +853,6 @@ public class test1 {
         String data = sb.toString();
         
     }
-    class Jsonarray{
-    	Response response;	
-    }
     
-    class Response{
-    	Header header;
-    	Body body;
-    }
     
-    class Header{
-    	int resultCode;
-    	String resultMsg;
-    }
-    
-    class Body{
-    	String dataType;
-    	Items items;
-    	int pageNo;
-    	int numOfRows;
-    	int totalCount;
-    }
-    
-    class Items{
-    	ArrayList<Item> item;
-    }
-    
-    class Item{
-    	int baseDate;
-    	int baseTime;
-		String category;
-		int fcstDate;
-		int fcstTime;
-		double fcstValue;
-		int nx;
-		int ny;
-    }
 }
