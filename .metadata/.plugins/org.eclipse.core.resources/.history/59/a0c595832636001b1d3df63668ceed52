@@ -62,7 +62,7 @@ class SrtNcstClass
 		int ny;
     }
     
-	void srtNcst(int inputdatenum, int inputdaynum, int x, int y, String city) throws IOException
+	void srtNcst(int inputdatenum, int inputdaynum, int x, int y) throws IOException
     {
 
     	String column = null;
@@ -230,7 +230,7 @@ class SrtNcstClass
 			}
     		
         	try { 
-        		FileOutputStream fos = new FileOutputStream(city+" 초단기실황"+inputdatenum+"_"+inputdaynum+".xlsx");
+        		FileOutputStream fos = new FileOutputStream("초단기실황"+inputdatenum+"_"+inputdaynum+".xlsx");
         		workbook.write(fos); fos.close(); System.out.println("성공");
         	}
         	catch(Exception e) { 
@@ -283,7 +283,7 @@ class SrtFcstClass
 		int ny;
     }
     
-	void srtFcst(int inputdatenum, int inputdaynum, int x, int y, String city) throws IOException
+	void srtFcst(int inputdatenum, int inputdaynum, int x, int y) throws IOException
     {
 
     	String column = null;
@@ -487,7 +487,7 @@ class SrtFcstClass
 			}
     		
         	try { 
-        		FileOutputStream fos = new FileOutputStream(city+" 초단기예보"+inputdatenum+"_"+inputdaynum+".xlsx");
+        		FileOutputStream fos = new FileOutputStream("초단기예보"+inputdatenum+"_"+inputdaynum+".xlsx");
         		workbook.write(fos); fos.close(); System.out.println("성공");
         	}
         	catch(Exception e) { 
@@ -540,7 +540,7 @@ class VilageClass
 		int ny;
     }
     
-	void vilage(int inputdatenum, int inputdaynum, int x, int y, String city) throws IOException
+	void vilage(int inputdatenum, int inputdaynum, int x, int y) throws IOException
     {
 
     	String column = null;
@@ -757,7 +757,7 @@ class VilageClass
 			}
     		
         	try { 
-        		FileOutputStream fos = new FileOutputStream(city+" 동네예보"+inputdatenum+"_"+inputdaynum+".xlsx");
+        		FileOutputStream fos = new FileOutputStream("동네예보"+inputdatenum+"_"+inputdaynum+".xlsx");
         		workbook.write(fos); fos.close(); System.out.println("성공");
         	}
         	catch(Exception e) { 
@@ -826,15 +826,15 @@ class test1 {
     	{
     	case "1":
     		SrtNcstClass sn = new SrtNcstClass();
-    		sn.srtNcst(inputdatenum,inputdaynum,inputx, inputy,city);
+    		sn.srtNcst(inputdatenum,inputdaynum,inputx, inputy);
     		break;
     	case "2":
     		SrtFcstClass sf = new SrtFcstClass();
-    		sf.srtFcst(inputdatenum, inputdaynum,inputx, inputy,city);
+    		sf.srtFcst(inputdatenum, inputdaynum,inputx, inputy);
     		break;
     	case "3":
     		VilageClass vc = new VilageClass();
-    		vc.vilage(inputdatenum,inputdaynum,inputx, inputy,city);
+    		vc.vilage(inputdatenum,inputdaynum,inputx, inputy);
     		break;
     	case "4":
     		vilagever(inputdatenum,inputdaynum);

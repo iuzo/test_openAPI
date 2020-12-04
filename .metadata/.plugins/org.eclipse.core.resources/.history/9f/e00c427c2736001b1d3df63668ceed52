@@ -822,6 +822,8 @@ class test1 {
     		}
     	}
     	
+    	System.out.printf(inputx+ "  " + inputy);
+    	
 		switch(input)
     	{
     	case "1":

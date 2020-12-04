@@ -12,8 +12,6 @@ import java.util.*;
 
 import java.io.FileOutputStream;
 import java.io.FileInputStream;
-
-import org.apache.poi.openxml4j.util.ZipSecureFile;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -62,7 +60,7 @@ class SrtNcstClass
 		int ny;
     }
     
-	void srtNcst(int inputdatenum, int inputdaynum, int x, int y, String city) throws IOException
+	void srtNcst(int inputdatenum, int inputdaynum) throws IOException
     {
 
     	String column = null;
@@ -74,8 +72,8 @@ class SrtNcstClass
         urlBuilder.append("&" + URLEncoder.encode("dataType","UTF-8") + "=" + URLEncoder.encode("JSON", "UTF-8")); /*요청자료형식(XML/JSON)Default: XML*/
         urlBuilder.append("&" + URLEncoder.encode("base_date","UTF-8") + "=" + URLEncoder.encode(Integer.toString(inputdatenum), "UTF-8")); /*15년 12월 1일 발표*/
         urlBuilder.append("&" + URLEncoder.encode("base_time","UTF-8") + "=" + URLEncoder.encode(Integer.toString(inputdaynum), "UTF-8")); /*06시 발표(정시단위)*/
-        urlBuilder.append("&" + URLEncoder.encode("nx","UTF-8") + "=" + URLEncoder.encode(Integer.toString(x), "UTF-8")); /*예보지점의 X 좌표값*/
-        urlBuilder.append("&" + URLEncoder.encode("ny","UTF-8") + "=" + URLEncoder.encode(Integer.toString(y), "UTF-8")); /*예보지점 Y 좌표*/
+        urlBuilder.append("&" + URLEncoder.encode("nx","UTF-8") + "=" + URLEncoder.encode("57", "UTF-8")); /*예보지점의 X 좌표값*/
+        urlBuilder.append("&" + URLEncoder.encode("ny","UTF-8") + "=" + URLEncoder.encode("119", "UTF-8")); /*예보지점 Y 좌표*/
         
     	URL url = new URL(urlBuilder.toString());
         
@@ -230,7 +228,7 @@ class SrtNcstClass
 			}
     		
         	try { 
-        		FileOutputStream fos = new FileOutputStream(city+" 초단기실황"+inputdatenum+"_"+inputdaynum+".xlsx");
+        		FileOutputStream fos = new FileOutputStream("초단기실황"+inputdatenum+"_"+inputdaynum+".xlsx");
         		workbook.write(fos); fos.close(); System.out.println("성공");
         	}
         	catch(Exception e) { 
@@ -283,7 +281,7 @@ class SrtFcstClass
 		int ny;
     }
     
-	void srtFcst(int inputdatenum, int inputdaynum, int x, int y, String city) throws IOException
+	void srtFcst(int inputdatenum, int inputdaynum) throws IOException
     {
 
     	String column = null;
@@ -295,8 +293,8 @@ class SrtFcstClass
         urlBuilder.append("&" + URLEncoder.encode("dataType","UTF-8") + "=" + URLEncoder.encode("json", "UTF-8")); /*요청자료형식(XML/JSON)Default: XML*/
         urlBuilder.append("&" + URLEncoder.encode("base_date","UTF-8") + "=" + URLEncoder.encode(Integer.toString(inputdatenum), "UTF-8")); /*15년 12월 1일 발표*/
         urlBuilder.append("&" + URLEncoder.encode("base_time","UTF-8") + "=" + URLEncoder.encode(Integer.toString(inputdaynum), "UTF-8")); /*06시30분 발표(30분 단위)- 매시각 45분 이후 호출*/
-        urlBuilder.append("&" + URLEncoder.encode("nx","UTF-8") + "=" + URLEncoder.encode(Integer.toString(x), "UTF-8")); /*예보지점 X 좌표값*/
-        urlBuilder.append("&" + URLEncoder.encode("ny","UTF-8") + "=" + URLEncoder.encode(Integer.toString(y), "UTF-8")); /*예보지점 Y 좌표값*/
+        urlBuilder.append("&" + URLEncoder.encode("nx","UTF-8") + "=" + URLEncoder.encode("57", "UTF-8")); /*예보지점 X 좌표값*/
+        urlBuilder.append("&" + URLEncoder.encode("ny","UTF-8") + "=" + URLEncoder.encode("119", "UTF-8")); /*예보지점 Y 좌표값*/
 		
     	URL url = new URL(urlBuilder.toString());
         
@@ -487,7 +485,7 @@ class SrtFcstClass
 			}
     		
         	try { 
-        		FileOutputStream fos = new FileOutputStream(city+" 초단기예보"+inputdatenum+"_"+inputdaynum+".xlsx");
+        		FileOutputStream fos = new FileOutputStream("초단기예보"+inputdatenum+"_"+inputdaynum+".xlsx");
         		workbook.write(fos); fos.close(); System.out.println("성공");
         	}
         	catch(Exception e) { 
@@ -540,7 +538,7 @@ class VilageClass
 		int ny;
     }
     
-	void vilage(int inputdatenum, int inputdaynum, int x, int y, String city) throws IOException
+	void vilage(int inputdatenum, int inputdaynum) throws IOException
     {
 
     	String column = null;
@@ -552,8 +550,8 @@ class VilageClass
         urlBuilder.append("&" + URLEncoder.encode("dataType","UTF-8") + "=" + URLEncoder.encode("json", "UTF-8")); /*요청자료형식(XML/JSON)Default: XML*/
         urlBuilder.append("&" + URLEncoder.encode("base_date","UTF-8") + "=" + URLEncoder.encode(Integer.toString(inputdatenum), "UTF-8")); /*15년 12월 1일발표*/
         urlBuilder.append("&" + URLEncoder.encode("base_time","UTF-8") + "=" + URLEncoder.encode(Integer.toString(inputdaynum), "UTF-8")); /*05시 발표*/
-        urlBuilder.append("&" + URLEncoder.encode("nx","UTF-8") + "=" + URLEncoder.encode(Integer.toString(x), "UTF-8")); /*예보지점 X 좌표값*/
-        urlBuilder.append("&" + URLEncoder.encode("ny","UTF-8") + "=" + URLEncoder.encode(Integer.toString(y), "UTF-8")); /*예보지점의 Y 좌표값*/
+        urlBuilder.append("&" + URLEncoder.encode("nx","UTF-8") + "=" + URLEncoder.encode("61", "UTF-8")); /*예보지점 X 좌표값*/
+        urlBuilder.append("&" + URLEncoder.encode("ny","UTF-8") + "=" + URLEncoder.encode("119", "UTF-8")); /*예보지점의 Y 좌표값*/
 		
     	URL url = new URL(urlBuilder.toString());
         
@@ -757,7 +755,7 @@ class VilageClass
 			}
     		
         	try { 
-        		FileOutputStream fos = new FileOutputStream(city+" 동네예보"+inputdatenum+"_"+inputdaynum+".xlsx");
+        		FileOutputStream fos = new FileOutputStream("동네예보"+inputdatenum+"_"+inputdaynum+".xlsx");
         		workbook.write(fos); fos.close(); System.out.println("성공");
         	}
         	catch(Exception e) { 
@@ -783,15 +781,10 @@ class test1 {
 
     	int inputdatenum = 0;
     	int inputdaynum = 0;
-    	int inputy = 0;
-    	int inputx = 0;
     	String data = null;
-    	String city = null;
-    	
     	Scanner menu = new Scanner(System.in);
     	Scanner datenum = new Scanner(System.in);
     	Scanner daynum = new Scanner(System.in);
-    	Scanner inputcity = new Scanner(System.in);
     	
     	
     	System.out.println("1.초단기실황, 2.초단기예보, 3.동네예보, 4.예보버전");
@@ -800,41 +793,26 @@ class test1 {
     	inputdatenum = datenum.nextInt();
     	System.out.println("시간을 입력해주세요 ex)0600");
     	inputdaynum = daynum.nextInt();
-    	System.out.println("지역을 검색해주세요 ex)화성시, 광진구");
-    	city = inputcity.next();
     	
-    	ZipSecureFile.setMinInflateRatio(0);
-
-    	FileInputStream fis=new FileInputStream("trans_xy.xlsx");
+    	FileInputStream fis=new FileInputStream("기상청18_동네예보 조회서비스_오픈API활용가이드_격자_위경도(20201005).xlsx");
     	XSSFWorkbook workbook = new XSSFWorkbook(fis);
     	XSSFSheet sheet=workbook.getSheetAt(0);
     	int rows=sheet.getPhysicalNumberOfRows();
-    	
-    	for(int i = 0; i < rows;  i++)
-    	{
-    		XSSFRow row = sheet.getRow(i);
-    		XSSFCell cell = row.getCell(3);
-    		if((cell.getStringCellValue()+"").equals(city))
-    		{
-    			inputx = Integer.parseInt(row.getCell(5).getStringCellValue());
-    			inputy = Integer.parseInt(row.getCell(6).getStringCellValue());
-    			break;
-    		}
-    	}
+
     	
 		switch(input)
     	{
     	case "1":
     		SrtNcstClass sn = new SrtNcstClass();
-    		sn.srtNcst(inputdatenum,inputdaynum,inputx, inputy,city);
+    		sn.srtNcst(inputdatenum,inputdaynum);
     		break;
     	case "2":
     		SrtFcstClass sf = new SrtFcstClass();
-    		sf.srtFcst(inputdatenum, inputdaynum,inputx, inputy,city);
+    		sf.srtFcst(inputdatenum, inputdaynum);
     		break;
     	case "3":
     		VilageClass vc = new VilageClass();
-    		vc.vilage(inputdatenum,inputdaynum,inputx, inputy,city);
+    		vc.vilage(inputdatenum,inputdaynum);
     		break;
     	case "4":
     		vilagever(inputdatenum,inputdaynum);
