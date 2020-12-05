@@ -802,7 +802,7 @@ class VilageVerClass
     
     class Item{
     	String filetype;
-    	long version;
+    	int version;
 		
     }
     
